@@ -1,0 +1,10 @@
+[host_group]
+<dns.resolved-name.com> ansible_host=<ip-address> ansible_user=<remote_host_user>
+
+[host_group:vars]
+http_port=80
+some_var="data"
+a_boolean=True
+
+# comment
+
