@@ -1,0 +1,8 @@
+---
+
+- name: Basic security hardening
+  hosts: all
+  become: true
+  roles:
+    - fail2ban
+    - ssh_hardening

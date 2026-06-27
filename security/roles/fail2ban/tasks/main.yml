@@ -1,0 +1,49 @@
+---
+- name: Ensure Fail2ban is installed
+  package:
+    name: fail2ban
+    state: present
+    
+- name: Ensure recidivist filter exists for Ubuntu 24.04
+  copy:
+    dest: /etc/fail2ban/filter.d/recidivist.conf
+    content: |
+      [Definition]
+      _groupsre = (?:(?:line|jail) (?P<jail>\S+)|(?P<file>\S+))
+      failregex = ^\[<jail>\] Ban <HOST>$
+      ignoreregex = 
+
+      [Init]
+      journalmatch = 
+  notify: Restart Fail2ban
+
+- name: Configure Fail2ban jail.local (SSH & Recidivist)
+  blockinfile:
+    path: /etc/fail2ban/jail.local
+    create: yes
+    marker: "# {mark} ANSIBLE MANAGED BLOCK: JAILS"
+    block: |
+      [sshd]
+      enabled  = true
+      port     = ssh
+      backend  = systemd
+      maxretry = 3
+      findtime = 10m
+      bantime  = 1h
+
+      [recidivist]
+      enabled   = true
+      logpath   = /var/log/fail2ban.log
+      filter    = recidivist
+      banaction = %(banaction_allports)s
+      bantime   = 1w
+      findtime  = 1d
+      maxretry  = 3
+      backend   = polling
+  notify: Restart Fail2ban
+
+- name: Ensure Fail2ban is enabled and running
+  service:
+    name: fail2ban
+    state: started
+    enabled: yes
