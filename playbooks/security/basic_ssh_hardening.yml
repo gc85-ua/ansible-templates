@@ -1,8 +1,8 @@
 ---
 
 - name: Basic security hardening
-  hosts: all
+  hosts: all # change it according to your inventory file
   become: true
   roles:
     - fail2ban
-    - ssh_hardening
+    - ssh

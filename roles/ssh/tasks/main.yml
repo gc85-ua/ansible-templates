@@ -1,0 +1,55 @@
+---
+- name: Ensure the sshd drop-in directory exists
+  ansible.builtin.file:
+    path: /etc/ssh/sshd_config.d
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+
+# Without this line sshd silently ignores every drop-in and the hardening is a no-op.
+- name: Check that sshd_config includes the drop-in directory
+  ansible.builtin.command:
+    cmd: grep -qE '^[[:space:]]*Include[[:space:]]+/etc/ssh/sshd_config\.d/\*\.conf' /etc/ssh/sshd_config
+  register: sshd_include_dropin
+  changed_when: false
+  failed_when: false
+
+- name: Verify that sshd_config includes the drop-in directory
+  ansible.builtin.assert:
+    that: sshd_include_dropin.rc == 0
+    fail_msg: >-
+      /etc/ssh/sshd_config has no 'Include /etc/ssh/sshd_config.d/*.conf' line,
+      so the drop-ins below would never be read. Add the Include as the first
+      directive in sshd_config before running this role.
+
+# Numbering must stay below 50: sshd takes the first value it sees, and Ubuntu
+# cloud images ship 50-cloud-init.conf which forces PasswordAuthentication yes.
+- name: Deploy sshd hardening drop-ins
+  ansible.builtin.template:
+    src: "{{ item }}.conf.j2"
+    dest: "/etc/ssh/sshd_config.d/{{ item }}.conf"
+    owner: root
+    group: root
+    mode: "0600"
+  loop:
+    - 10-authentication
+    - 20-forwarding
+    - 30-limits
+    - 40-logging
+    - 50-crypto
+  register: sshd_dropins
+  notify: Restart SSH
+
+# Runs before the handler: if this fails the play aborts and SSH is left alone.
+- name: Validate the effective sshd configuration
+  ansible.builtin.command:
+    cmd: /usr/sbin/sshd -t
+  changed_when: false
+  when: sshd_dropins is changed
+
+- name: Ensure SSH is enabled and running
+  ansible.builtin.service:
+    name: ssh
+    state: started
+    enabled: yes

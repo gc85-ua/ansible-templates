@@ -1,0 +1,11 @@
+---
+
+- name: Basic security hardening
+  hosts: all # change it according to your inventory file
+  become: true
+  vars:
+    enable_google_authenticator: true
+  roles:
+    - fail2ban
+    - pam
+    - ssh

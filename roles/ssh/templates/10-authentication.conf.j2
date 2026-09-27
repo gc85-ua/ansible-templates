@@ -1,0 +1,11 @@
+#jinja2: trim_blocks: True
+# Managed by Ansible (ssh_hardening role) -- local edits will be overwritten.
+{% set two_factor = enable_google_authenticator | bool %}
+UsePAM yes
+PermitRootLogin no
+PubkeyAuthentication yes
+PermitEmptyPasswords no
+PasswordAuthentication {{ two_factor | ternary('yes', 'no') }}
+KbdInteractiveAuthentication {{ two_factor | ternary('yes', 'no') }}
+ChallengeResponseAuthentication {{ two_factor | ternary('yes', 'no') }}
+AuthenticationMethods {{ two_factor | ternary('publickey keyboard-interactive', 'publickey') }}
