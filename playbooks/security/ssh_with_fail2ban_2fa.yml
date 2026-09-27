@@ -1,6 +1,6 @@
 ---
 
-- name: Basic security hardening
+- name: SSH hardening with fail2ban and 2FA
   hosts: all # change it according to your inventory file
   become: true
   vars:
