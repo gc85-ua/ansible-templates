@@ -1,0 +1,5 @@
+# Managed by Ansible (ssh role) -- local edits will be overwritten.
+
+AllowGroups {{ allowed_groups | join(' ') }}
+
+DenyGroups {{ denied_groups | join(' ') }}

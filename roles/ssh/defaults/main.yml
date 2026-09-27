@@ -1,2 +1,22 @@
 ---
 enable_google_authenticator: false
+
+config_items:
+  - 10-authentication
+  - 20-forwarding
+  - 30-limits
+  - 40-logging
+  - 50-crypto
+
+allowed_users:
+  - "{{ ansible_user }}"
+denied_users:
+  - root
+
+allowed_groups:
+  - sudo
+  - adm
+  - wheel
+
+denied_groups:
+  - root

@@ -32,12 +32,7 @@
     owner: root
     group: root
     mode: "0600"
-  loop:
-    - 10-authentication
-    - 20-forwarding
-    - 30-limits
-    - 40-logging
-    - 50-crypto
+  loop: "{{ config_items }}"
   register: sshd_dropins
   notify: Restart SSH
 

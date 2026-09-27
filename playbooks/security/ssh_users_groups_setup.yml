@@ -1,0 +1,14 @@
+---
+
+- name: Basic security hardening
+  hosts: all # change it according to your inventory file
+  become: true
+  vars:
+    config_items:
+      - 70-users
+      - 75-groups
+    allowed_users:
+      - "{{ ansible_user }}"
+      - "guoqing"
+  roles:
+    - ssh
