@@ -1,5 +1,4 @@
 ---
-
 - name: Basic security hardening
   hosts: all # change it according to your inventory file
   become: true
@@ -9,6 +8,6 @@
       - 75-groups
     allowed_users:
       - "{{ ansible_user }}"
-      - "guoqing"
+      - guoqing
   roles:
     - ssh

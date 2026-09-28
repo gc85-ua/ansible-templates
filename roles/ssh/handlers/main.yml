@@ -1,5 +1,10 @@
 ---
-- name: Restart SSH
-  service:
+- name: Validate the effective sshd configuration
+  ansible.builtin.command:
+    cmd: /usr/sbin/sshd -t
+  changed_when: false
+
+- name: Reload SSH
+  ansible.builtin.service:
     name: ssh
-    state: restarted
+    state: reloaded

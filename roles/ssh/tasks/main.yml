@@ -28,23 +28,21 @@
 - name: Deploy sshd hardening drop-ins
   ansible.builtin.template:
     src: "{{ item }}.conf.j2"
-    dest: "/etc/ssh/sshd_config.d/{{ item }}.conf"
+    dest: /etc/ssh/sshd_config.d/{{ item }}.conf
     owner: root
     group: root
     mode: "0600"
+    validate: /usr/sbin/sshd -t -f %s
   loop: "{{ config_items }}"
+  loop_control:
+    label: "{{ item }}.conf"
   register: sshd_dropins
-  notify: Restart SSH
-
-# Runs before the handler: if this fails the play aborts and SSH is left alone.
-- name: Validate the effective sshd configuration
-  ansible.builtin.command:
-    cmd: /usr/sbin/sshd -t
-  changed_when: false
-  when: sshd_dropins is changed
+  notify:
+    - Validate the effective sshd configuration
+    - Reload SSH
 
 - name: Ensure SSH is enabled and running
   ansible.builtin.service:
     name: ssh
     state: started
-    enabled: yes
+    enabled: true

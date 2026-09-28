@@ -1,26 +1,32 @@
 ---
 - name: Ensure Fail2ban is installed
-  package:
+  ansible.builtin.package:
     name: fail2ban
     state: present
-    
-- name: Ensure recidivist filter exists for Ubuntu 24.04
-  copy:
+
+- name: Ensure recidivist filter exists
+  ansible.builtin.copy:
     dest: /etc/fail2ban/filter.d/recidivist.conf
+    owner: root
+    group: root
+    mode: "0644"
     content: |
       [Definition]
       _groupsre = (?:(?:line|jail) (?P<jail>\S+)|(?P<file>\S+))
       failregex = ^\[<jail>\] Ban <HOST>$
-      ignoreregex = 
+      ignoreregex =
 
       [Init]
-      journalmatch = 
+      journalmatch =
   notify: Restart Fail2ban
 
 - name: Configure Fail2ban jail.local (SSH & Recidivist)
-  blockinfile:
+  ansible.builtin.blockinfile:
     path: /etc/fail2ban/jail.local
-    create: yes
+    create: true
+    owner: root
+    group: root
+    mode: "0644"
     marker: "# {mark} ANSIBLE MANAGED BLOCK: JAILS"
     block: |
       [sshd]
@@ -43,7 +49,7 @@
   notify: Restart Fail2ban
 
 - name: Ensure Fail2ban is enabled and running
-  service:
+  ansible.builtin.service:
     name: fail2ban
     state: started
-    enabled: yes
+    enabled: true

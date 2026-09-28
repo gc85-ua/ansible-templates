@@ -1,8 +1,7 @@
 ---
-
 - name: SSH hardening with fail2ban
   hosts: all # change it according to your inventory file
   become: true
   roles:
     - role: fail2ban
-    - role: ssh_hardening
+    - role: ssh
